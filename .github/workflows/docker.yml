@@ -38,7 +38,7 @@ jobs:
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
-        if: ${{ github.event_name != "pull_request" }}
+        if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.5.0
         with:
           cosign-release: 'v2.2.4'
@@ -81,7 +81,7 @@ jobs:
         with:
           context: .
           file: Dockerfile-development
-          push: ${{ github.event_name != "pull_request" }}
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
@@ -89,13 +89,13 @@ jobs:
           #cache-to: type=gha,mode=max
 
       - name: Print tags summary
-        if: ${{ github.event_name != "pull_request" }}
+        if: github.event_name != 'pull_request'
         run: |
           all_tags="${{ steps.meta.outputs.tags }}"
           echo -e "### Pushed:\n$(echo $all_tags | jq -Rrsc 'split(" ")[] | "- \(.)"')" >> $GITHUB_STEP_SUMMARY
 
       - name: Generate image artifact attestation
-        if: ${{ github.event_name != "pull_request" }}
+        if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@v1
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -108,7 +108,7 @@ jobs:
       # transparency data even for private images, pass --force to cosign below.
       # https://github.com/sigstore/cosign
       - name: Sign the published Docker image
-        if: ${{ github.event_name != "pull_request" }}
+        if: github.event_name != 'pull_request'
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ steps.meta.outputs.tags }}
